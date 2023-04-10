@@ -9,11 +9,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 
-//미들웨어, 런타임 시 static/css, static/js는 외부 클라이언트가 /css, /js로 접근 가능
-app.use("/css", express.static("./static/css"));
-app.use("/js", express.static("./static/js"));
-
 app.get("/", function (request, response) {
+  /*
   fs.readFile("./static/index.html", function (err, data) {
     if (err) {
       response.send("에러");
@@ -26,6 +23,10 @@ app.get("/", function (request, response) {
       response.end();
     }
   });
+  */
+
+  response.send(200);
+
   console.log("유저가 /으로 접속하였습니다!");
 });
 
