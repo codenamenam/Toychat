@@ -18,6 +18,7 @@ app.get("/", function (request, response) {
     if (err) {
       response.send("에러");
     } else {
+      //제대로 응답함
       response.writeHead(200, {
         "Content-Type": "text/html",
       });
@@ -28,16 +29,41 @@ app.get("/", function (request, response) {
   console.log("유저가 /으로 접속하였습니다!");
 });
 
+//socket x sockets o
 io.sockets.on("connection", function (socket) {
-  console.log("유저 접속 됨");
+  //새로운 유저 접속
+  socket.on("newUser", function (name) {
+    console.log(name + "님이 접속하셧습니다.");
 
-  //클라이언트의 "send" 이벤트일때
-  socket.on("send", function (data) {
-    console.log("전달된 메시지:", data.msg);
+    //소켓에 이름을 저장
+    socket.name = name;
+
+    io.sockets.emit("update", {
+      type: "connect",
+      name: "SERVER",
+      message: name + "님이 접속하셨습니다.",
+    });
   });
 
+  socket.on("message", function (data) {
+    data.name = socket.name;
+
+    console.log(data);
+
+    //클라이언트에 전달
+    socket.broadcast.emit("update", data);
+  });
+
+  //클라이언트의 "disconnect" 이벤트일때
   socket.on("disconnect", function () {
-    console.log("접속 종료");
+    console.log(socket.name + "님이 나가셨습니다.");
+
+    //클라이언트에 전달
+    socket.broadcast.emit("update", {
+      type: "disconnect",
+      name: "SERVER",
+      message: socket.name + "님이 나가셨습니다.",
+    });
   });
 });
 
