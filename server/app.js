@@ -1,13 +1,22 @@
 //모듈 불러오기
 const express = require("express");
-const socket = require("socket.io");
 const http = require("http");
 const fs = require("fs");
+const cors = require("cors");
 
 //초기 세팅
 const app = express();
 const server = http.createServer(app);
-const io = socket(server);
+
+//socket.io, 서버측의 cors 설정
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+app.use(cors());
 
 app.get("/", function (request, response) {
   /*
@@ -25,7 +34,7 @@ app.get("/", function (request, response) {
   });
   */
 
-  response.send(200);
+  response.sendStatus(200);
 
   console.log("유저가 /으로 접속하였습니다!");
 });
@@ -34,7 +43,7 @@ app.get("/", function (request, response) {
 io.sockets.on("connection", function (socket) {
   //새로운 유저 접속
   socket.on("newUser", function (name) {
-    console.log(name + "님이 접속하셧습니다.");
+    console.log(name + "님이 접속하셨습니다.");
 
     //소켓에 이름을 저장
     socket.name = name;
